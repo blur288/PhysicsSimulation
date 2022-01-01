@@ -8,7 +8,7 @@ namespace Simulation
 
 	struct Vec2
 	{
-		float x, y;
+		double x, y;
 
 		Vec2 operator +(Vec2 Vector)
 		{
@@ -19,18 +19,29 @@ namespace Simulation
 		{
 			return { this->x - Vector.x, this->y - Vector.y };
 		}
+
+		Vec2 operator *(double Scalar)
+		{
+			return { this->x * Scalar, this->y * Scalar };
+		}
+
+		void Convert(Vector2 Converter)
+		{
+			this->x = Converter.x;
+			this->y = Converter.y;
+		}
 	};
 
 	class Object
 	{
 	public:
 		Vec2 Position;
-		float mass; //kg
-		float rad;
+		double mass; //kg
+		double rad;
 		Vec2 VelocityVector;
-		float Force;
+		double Force;
 
-		Object(float mass, Vec2 Position, Vec2 VelocityVector, float rad, float Force)
+		Object(double mass, Vec2 Position, Vec2 VelocityVector, double rad, double Force)
 		{
 			this->mass = mass;
 			this->Position = Position;
@@ -38,7 +49,7 @@ namespace Simulation
 			this->VelocityVector = VelocityVector;
 		}
 		//Distance Forumla / Pythagoren Therom
-		static float DistanceBetweenObjects(Object Ob1, Object Ob2)
+		static double DistanceBetweenObjects(Object Ob1, Object Ob2)
 		{
 			return sqrt(
 				(Ob1.Position.x - Ob2.Position.x) * (Ob1.Position.x - Ob2.Position.x) +
@@ -54,24 +65,30 @@ namespace Simulation
 		
 		int PhyscisMain()
 		{
-			for (int i = 0; i < Objects.size(); i++)
-			{
-				for (int j = 0; j < Objects.size(); j++)
-				{
-					if (i == j)
-						continue;
-					//Force of gravity
-					Objects[i].Force = (G * Objects[j].mass * Objects[i].mass) / Object::DistanceBetweenObjects(Objects[i], Objects[j]);
-					//
-					Objects[i].VelocityVector = { Objects[i].Position.x - Objects[j].Position.x, Objects[i].Position.y - Objects[j].Position.y };
+			Object ObjectOne = Objects[0];
+			Object ObjectTwo = Objects[1];
 
-					Objects[i].Position.x = Objects[i].Force * (Objects[i].Position.x);
-					Objects[i].Position.y = Objects[i].Force * (Objects[i].Position.y);
-				}
-			}
+			double Force = (G * ObjectOne.mass * ObjectTwo.mass / pow(Object::DistanceBetweenObjects(ObjectOne, ObjectTwo), 2));
+
+			Vec2 VectorBetweenPoints = ObjectOne.Position - ObjectTwo.Position;
+			Objects[0].Position = ObjectOne.Position - VectorBetweenPoints * Force;
+
+			return 1;
 		}
 
-		void AddObject(float mass, Vec2 Position, Vec2 VelocityVector, float rad, float Force)
+		void DrawVectorLines()
+		{
+			Object ObjectOne = Objects[0];
+			Object ObjectTwo = Objects[1];
+
+			double Force =   (G * ObjectOne.mass * ObjectTwo.mass / pow(Object::DistanceBetweenObjects(ObjectOne, ObjectTwo), 2) );
+			
+			Vec2 VectorBetweenPoints = ObjectOne.Position - ObjectTwo.Position;
+			Vec2 EndPoint = ObjectOne.Position - VectorBetweenPoints * Force;
+			DrawLine(ObjectOne.Position.x, ObjectOne.Position.y, EndPoint.x, EndPoint.y, BLUE);
+		}
+
+		void AddObject(double mass, Vec2 Position, Vec2 VelocityVector, double rad, double Force)
 		{
 			Object newObject(mass, Position, VelocityVector, rad, Force);
 			Objects.push_back(newObject);
