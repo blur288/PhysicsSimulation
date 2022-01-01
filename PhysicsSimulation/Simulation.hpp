@@ -51,7 +51,7 @@ namespace Simulation
 	{
 	public:
 		std::vector<Object> Objects;
-
+		
 		int PhyscisMain()
 		{
 			for (int i = 0; i < Objects.size(); i++)
@@ -60,13 +60,13 @@ namespace Simulation
 				{
 					if (i == j)
 						continue;
-					Objects[i].Force = (G * Objects[j].mass * Objects[i].mass) /
-						Object::DistanceBetweenObjects(Objects[i], Objects[j]);
+					//Force of gravity
+					Objects[i].Force = (G * Objects[j].mass * Objects[i].mass) / Object::DistanceBetweenObjects(Objects[i], Objects[j]);
+					//
+					Objects[i].VelocityVector = { Objects[i].Position.x - Objects[j].Position.x, Objects[i].Position.y - Objects[j].Position.y };
 
-					Objects[i].VelocityVector = { Objects[i].Position.x - Objects[j].Position.x,
-					Objects[i].Position.y - Objects[j].Position.y };
-
-					Objects[i].Position = Objects[i].Force * (Objects[i].Position.x)
+					Objects[i].Position.x = Objects[i].Force * (Objects[i].Position.x);
+					Objects[i].Position.y = Objects[i].Force * (Objects[i].Position.y);
 				}
 			}
 		}
@@ -77,4 +77,12 @@ namespace Simulation
 			Objects.push_back(newObject);
 		}
 	};
+
+	void DrawObjects(Physics sim)
+	{
+		for (int i = 0; i < sim.Objects.size(); i++)
+		{
+			DrawCircle(sim.Objects[i].Position.x, sim.Objects[i].Position.y, sim.Objects[i].rad, BLACK);
+		}
+	}
 };
