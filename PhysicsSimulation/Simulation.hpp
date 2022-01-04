@@ -30,6 +30,11 @@ namespace Simulation
 			this->x = Converter.x;
 			this->y = Converter.y;
 		}
+
+		Vector2 ToVector2()
+		{
+			return { (float)this->x, (float)this->y };
+		}
 	};
 
 	class Object
@@ -71,7 +76,14 @@ namespace Simulation
 			double Force = (G * ObjectOne.mass * ObjectTwo.mass / pow(Object::DistanceBetweenObjects(ObjectOne, ObjectTwo), 2));
 
 			Vec2 VectorBetweenPoints = ObjectOne.Position - ObjectTwo.Position;
-			Objects[0].Position = ObjectOne.Position - VectorBetweenPoints * Force;
+			//Objects[0].Position 
+			Vec2 NewPosition = ObjectOne.Position - VectorBetweenPoints * Force;
+			if (CheckCollisionCircles(NewPosition.ToVector2(), Objects[0].rad, Objects[1].Position.ToVector2(), Objects[1].rad))
+				return 1;
+			else
+			{
+				Objects[0].Position = NewPosition;
+			}
 
 			return 1;
 		}
@@ -84,7 +96,7 @@ namespace Simulation
 			double Force =   (G * ObjectOne.mass * ObjectTwo.mass / pow(Object::DistanceBetweenObjects(ObjectOne, ObjectTwo), 2) );
 			
 			Vec2 VectorBetweenPoints = ObjectOne.Position - ObjectTwo.Position;
-			Vec2 EndPoint = ObjectOne.Position - VectorBetweenPoints * Force;
+			Vec2 EndPoint = ObjectOne.Position - VectorBetweenPoints * Force * 1000;
 			DrawLine(ObjectOne.Position.x, ObjectOne.Position.y, EndPoint.x, EndPoint.y, BLUE);
 		}
 
